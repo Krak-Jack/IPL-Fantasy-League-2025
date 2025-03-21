@@ -15,12 +15,25 @@
     <section id="team-selection">
         <h2>Select Your Team</h2>
         <form id="teamForm">
-            <label for="player1">Player 1: </label>
-            <input type="text" id="player1" name="player1" required>
+            <label for="teamName">Team Name: </label>
+            <input type="text" id="teamName" name="teamName" required>
             <br>
-            <label for="player2">Player 2: </label>
-            <input type="text" id="player2" name="player2" required>
-            <br>
+
+            <!-- Form for players -->
+            <h3>Capped Players (Max 5)</h3>
+            <div>
+                <label for="player1">Player 1: </label>
+                <input type="text" id="player1" name="player1" required>
+                <label for="player2">Player 2: </label>
+                <input type="text" id="player2" name="player2" required>
+                <label for="player3">Player 3: </label>
+                <input type="text" id="player3" name="player3" required>
+                <label for="player4">Player 4: </label>
+                <input type="text" id="player4" name="player4" required>
+                <label for="player5">Player 5: </label>
+                <input type="text" id="player5" name="player5" required>
+            </div>
+            
             <button type="submit">Submit Team</button>
         </form>
     </section>
@@ -31,19 +44,19 @@
     </section>
 
     <script type="module">
-        // Import Firebase
+        // Import Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
 
-        // Firebase Configuration (Updated)
+        // Firebase Configuration (updated with your project details)
         const firebaseConfig = {
-            apiKey: "AIzaSyAqK8x194H8NzQLnTOUHEKpfp7BGz3N5e8",
-            authDomain: "ipl-fantasy-league-2025.firebaseapp.com",
-            projectId: "ipl-fantasy-league-2025",
-            storageBucket: "ipl-fantasy-league-2025.appspot.com", // Corrected
-            messagingSenderId: "122517736986",
-            appId: "1:122517736986:web:5d89744f34331db1568ba3",
-            measurementId: "G-BD8VJV8HXY"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID",
+            measurementId: "YOUR_MEASUREMENT_ID"
         };
 
         // Initialize Firebase
@@ -54,15 +67,21 @@
         document.getElementById('teamForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            // Get input values
-            const player1 = document.getElementById('player1').value;
-            const player2 = document.getElementById('player2').value;
+            const teamName = document.getElementById('teamName').value;
+            const players = [
+                document.getElementById('player1').value,
+                document.getElementById('player2').value,
+                document.getElementById('player3').value,
+                document.getElementById('player4').value,
+                document.getElementById('player5').value
+            ];
 
             try {
-                // Save to Firebase Firestore
+                // Save team to Firestore with initial points set to 0
                 await addDoc(collection(db, "teams"), {
-                    player1: player1,
-                    player2: player2,
+                    teamName: teamName,
+                    players: players,
+                    points: 0,
                     timestamp: new Date()
                 });
 
@@ -75,7 +94,7 @@
             }
         });
 
-        // Function to Load Submitted Teams from Firebase
+        // Function to Load Submitted Teams from Firestore
         async function loadTeams() {
             const teamsList = document.getElementById("teamsList");
             teamsList.innerHTML = ""; // Clear existing list
@@ -84,7 +103,7 @@
             querySnapshot.forEach((doc) => {
                 const team = doc.data();
                 const listItem = document.createElement("li");
-                listItem.textContent = `${team.player1} & ${team.player2}`;
+                listItem.textContent = `${team.teamName}: Players - ${team.players.join(", ")} - Points: ${team.points}`;
                 teamsList.appendChild(listItem);
             });
         }
