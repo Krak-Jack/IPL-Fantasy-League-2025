@@ -30,10 +30,15 @@
         <ul id="teamsList"></ul>
     </section>
 
+    <section id="team-points">
+        <h2>Points Overview</h2>
+        <ul id="pointsList"></ul>
+    </section>
+
     <script type="module">
         // Import Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
 
         // Firebase Configuration (Updated)
         const firebaseConfig = {
@@ -63,7 +68,8 @@
                 await addDoc(collection(db, "teams"), {
                     player1: player1,
                     player2: player2,
-                    timestamp: new Date()
+                    timestamp: new Date(),
+                    points: 0 // Initialize the points for this team
                 });
 
                 alert('Team successfully submitted!');
@@ -84,9 +90,18 @@
             querySnapshot.forEach((doc) => {
                 const team = doc.data();
                 const listItem = document.createElement("li");
-                listItem.textContent = `${team.player1} & ${team.player2}`;
+                listItem.textContent = `${team.player1} & ${team.player2} - Points: ${team.points}`;
                 teamsList.appendChild(listItem);
             });
+        }
+
+        // Function to Update Team Points (Simulate a match)
+        async function updateTeamPoints(teamId, points) {
+            const teamRef = doc(db, "teams", teamId);
+            await updateDoc(teamRef, {
+                points: points // Update the points for this team
+            });
+            loadTeams(); // Refresh teams list after updating points
         }
 
         // Load teams when the page loads
