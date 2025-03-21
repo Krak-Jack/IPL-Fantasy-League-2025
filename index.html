@@ -30,15 +30,10 @@
         <ul id="teamsList"></ul>
     </section>
 
-    <section id="team-points">
-        <h2>Points Overview</h2>
-        <ul id="pointsList"></ul>
-    </section>
-
     <script type="module">
         // Import Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
 
         // Firebase Configuration (Updated)
         const firebaseConfig = {
@@ -55,7 +50,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Handle Form Submission
+        // Handle Form Submission (Updated collection name to 'Participants')
         document.getElementById('teamForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
@@ -64,12 +59,11 @@
             const player2 = document.getElementById('player2').value;
 
             try {
-                // Save to Firebase Firestore
-                await addDoc(collection(db, "teams"), {
+                // Save to Firebase Firestore (Updated collection name to 'Participants')
+                await addDoc(collection(db, "Participants"), {
                     player1: player1,
                     player2: player2,
-                    timestamp: new Date(),
-                    points: 0 // Initialize the points for this team
+                    timestamp: new Date()
                 });
 
                 alert('Team successfully submitted!');
@@ -81,27 +75,18 @@
             }
         });
 
-        // Function to Load Submitted Teams from Firebase
+        // Function to Load Submitted Teams from Firebase (Updated collection name to 'Participants')
         async function loadTeams() {
             const teamsList = document.getElementById("teamsList");
             teamsList.innerHTML = ""; // Clear existing list
 
-            const querySnapshot = await getDocs(collection(db, "teams"));
+            const querySnapshot = await getDocs(collection(db, "Participants"));
             querySnapshot.forEach((doc) => {
                 const team = doc.data();
                 const listItem = document.createElement("li");
-                listItem.textContent = `${team.player1} & ${team.player2} - Points: ${team.points}`;
+                listItem.textContent = `${team.player1} & ${team.player2}`;
                 teamsList.appendChild(listItem);
             });
-        }
-
-        // Function to Update Team Points (Simulate a match)
-        async function updateTeamPoints(teamId, points) {
-            const teamRef = doc(db, "teams", teamId);
-            await updateDoc(teamRef, {
-                points: points // Update the points for this team
-            });
-            loadTeams(); // Refresh teams list after updating points
         }
 
         // Load teams when the page loads
